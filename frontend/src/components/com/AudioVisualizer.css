@@ -1,0 +1,40 @@
+.visualizer-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+  *
+{
+  font-family: 'Inter Tight';
+}
+  .glass-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.2); 
+    /* semi-transparent white background */
+    backdrop-filter: blur(40px); /* Apply the blur effect */
+    z-index: 1; /* Ensure it's on top of the canvas */
+  }
+  
+  .visualizer-canvas {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    z-index: 0; /* Ensure it's behind the glass overlay */
+  }
+  
+  .centered-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem; /* Adjust font size as needed */
+    color: black; /* Text color */
+    font-weight: bold; /* Font weight */
+    /* text-shadow: 0 0 10px rgba(0, 0, 0, 0.5); Optional: add shadow for better visibility */
+    z-index: 2; /* Ensure it's on top of the glass overlay */
+  }
+  

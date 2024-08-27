@@ -1,0 +1,20 @@
+*
+{
+  font-family: 'Inter Tight';
+}
+/* styles.css */
+.App {
+  position: relative;
+  overflow: hidden; /* Ensure the canvas and blur div stay within the container */
+}
+
+.blurred-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width:1000px;
+  height: 4000px;
+  backdrop-filter: blur(50px); /* Apply a blur effect */
+  background: rgba(255, 255, 255, 0.3); /* Semi-transparent white background */
+  z-index: 0; /* Ensure this is above the canvas but below other content */
+}
