@@ -1,0 +1,10 @@
+Psyozen_ai Folder Structure
+
+├── Emotion_analyzer_test.ipynb
+├── README.md
+├── bot_config.ipynb
+├── emotion_detector.ipynb
+├── llm_agent.ipynb
+├── main.ipynb
+└── psyozen_integrated_testing_with_ollama.ipynb
+
