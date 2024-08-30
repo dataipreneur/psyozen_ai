@@ -6,8 +6,12 @@ import speech_recognition as sr
 import json
 from gtts import gTTS
 import ollama
-app = FastAPI()
 
+app = FastAPI()
+modelfile='''
+FROM mistral
+SYSTEM You are therapist who listens to people and talks to them emphatethically and gives solutions when necessary
+'''
 def check_wav_file(file_path):
     try:
         with wave.open(file_path, 'rb') as wav_file:
@@ -48,6 +52,17 @@ def generate_tts_stream(text):
     audio_stream.seek(0)  # Reset stream position to the beginning
     return audio_stream
 
+async def get_model_response(text):
+    try:
+        response = ollama.chat(
+            model='mistral',
+            messages=[{'role': 'user', 'content': text}],
+            stream=False
+        )
+        return response['message']['content']
+    except Exception as e:
+        return f"An error occurred with the model: {e}"
+
 @app.websocket("/ws/audio")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
@@ -80,12 +95,21 @@ async def websocket_endpoint(websocket: WebSocket):
                 # Send back the transcription result as JSON
                 await websocket.send_text(json_result)
 
-                # Generate TTS response stream
-                tts_audio_stream = generate_tts_stream("There had to be a better way. That's all Nancy could think as she sat at her desk staring at her computer screen. She'd already spent five years of her life in this little cubicle staring at her computer doing that didn't seem to matter to anyone including her own boss. There had to be more to her life than this and there had to be a better way to make a living. That's what she was thinking when the earthquake struck.")
-
+                # Get model response based on transcription
+               
+                model_response = await get_model_response(transcription)
+                transcription_response = {
+                    "entity": "assistant",
+                    "message": model_response
+                }
+                json_response = json.dumps(transcription_response, indent=2)
+                await websocket.send_text(json_response)
+                # Generate TTS response stream from the model's response
+                tts_audio_stream = generate_tts_stream(model_response)
+                
                 # Send the TTS audio directly to the client
                 await websocket.send_bytes(tts_audio_stream.read())
-
+               
             except Exception as e:
                 print(f"Error during message processing: {e}")
                 break

@@ -1,9 +1,10 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import './AudioVisualizer.css'; // Import the CSS file for styling
 
 const AudioVisualizer = ({ audioUrl }) => {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false); // State to track if audio is playing
 
   useEffect(() => {
     if (!audioUrl) return;
@@ -76,15 +77,19 @@ const AudioVisualizer = ({ audioUrl }) => {
       requestAnimationFrame(animateBars);
     };
 
-    audio.play();
-    animateBars();
-
+    audio.onplay = () => setIsPlaying(true); // Set isPlaying to true when audio starts playing
+    audio.onpause = () => setIsPlaying(false); // Set isPlaying to false when audio pauses
     audio.onended = () => {
+      setIsPlaying(false); // Set isPlaying to false when audio ends
       URL.revokeObjectURL(audioUrl);
     };
 
+    audio.play();
+    animateBars();
+
     return () => {
       audio.pause();
+      setIsPlaying(false);
       URL.revokeObjectURL(audioUrl);
       resizeObserver.disconnect();
     };
@@ -97,7 +102,7 @@ const AudioVisualizer = ({ audioUrl }) => {
         ref={canvasRef}
         className="visualizer-canvas"
       />
-      <div className="centered-text">PsyOzen</div>
+      <div className={`centered-text ${isPlaying ? 'playing' : ''}`}>PsyOzen</div>
     </div>
   );
 };

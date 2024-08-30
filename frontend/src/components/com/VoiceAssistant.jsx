@@ -6,6 +6,7 @@ import { Mic, MicOff, Bot, User } from 'lucide-react';
 import RecordRTC from 'recordrtc';
 import * as WavEncoder from 'wav-encoder';
 import AudioVisualizer from './AudioVisualizer';
+import { ModeToggle } from '../ui/mode-toggle';
 
 export default function VoiceAssistant() {
   const [messages, setMessages] = useState([
@@ -42,6 +43,7 @@ export default function VoiceAssistant() {
             console.log("Received JSON data");
             try {
               const textData = await event.data;
+              console.log(textData);
               const data = JSON.parse(textData);
               if (data.entity === 'user') {
                 setMessages(prevMessages => [
@@ -51,7 +53,7 @@ export default function VoiceAssistant() {
               } else {
                 setMessages(prevMessages => [
                   ...prevMessages,
-                  { role: 'assistant', content: 'Audio received' }
+                  { role: 'assistant', content: data.message }
                 ]);
               }
             } catch (error) {
@@ -85,7 +87,6 @@ export default function VoiceAssistant() {
           };
           const wavBlob = await WavEncoder.encode(wavData);
           const wavUrl = URL.createObjectURL(new Blob([wavBlob], { type: 'audio/wav' }));
-          // setAudioUrl(wavUrl);
           wsRef.current.send(wavBlob);
         } catch (error) {
           console.error('Error encoding audio data:', error);
@@ -98,16 +99,16 @@ export default function VoiceAssistant() {
 
   const playReceivedAudio = (audioBlob) => {
     const audioUrl = URL.createObjectURL(audioBlob);
-    setAudioUrl(audioUrl); // Set audioUrl to trigger visualization
+    setAudioUrl(audioUrl);
   };
 
   return (
     <div className="flex flex-col h-screen">
       <div className="flex flex-grow">
-        <div className="hidden md:flex flex-col border-r border-gray-300 w-1/4">
-          <div className="p-4 font-semibold text-lg border-gray-300"></div>
+        <div className="hidden md:flex flex-col border-r w-1/4">
+      <ModeToggle/>
           <ScrollArea className="flex-grow p-2">
-            <h3 className="font-semibold ml-4 mb-2">Today</h3>
+            <h3 className="ml-4 mb-2 mt-12">Today</h3>
             <div className="space-y-2">
               {['Weather forecast', 'Set a reminder', 'Play music'].map((item, index) => (
                 <Button key={index} variant="ghost" className="w-full justify-start rounded-md">
@@ -118,29 +119,30 @@ export default function VoiceAssistant() {
           </ScrollArea>
         </div>
 
-        <div className="flex-grow flex flex-col border-r border-gray-300 w-1/4">
-          <div className="p-4 font-semibold text-lg border-b border-gray-300">Audio Visualization</div>
-          <div className="flex-grow flex">
-            <AudioVisualizer audioUrl={audioUrl} />
-          </div>
+        <div className="flex-grow flex flex-col border-r w-2/4">
+          <div className="p-4 text-lg border-b">Psyozen Assistant</div>
+          <div className="flex-grow flex shadow-inset-purple">
+  <AudioVisualizer audioUrl={audioUrl} />
+</div>
+
         </div>
 
         <div className="flex-grow flex flex-col">
-          <ScrollArea className="h-[600px]  rounded-md border p-4">
+          <ScrollArea className="h-[600px] rounded-md border p-4">
             {messages.map((message, index) => (
               <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`flex items-start space-x-2 ${message.role === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
                   <Avatar>
                     <AvatarFallback>{message.role === 'user' ? <User /> : <Bot />}</AvatarFallback>
                   </Avatar>
-                  <div className={`rounded-lg p-3 m-3 ${message.role === 'user' ? 'text-white bg-primary' : 'bg-gray-200'}`}>
+                  <div className={`rounded-lg p-3 m-3 max-w-md ${message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-secondary'}`}>
                     {message.content}
                   </div>
                 </div>
               </div>
             ))}
           </ScrollArea>
-          <div className="p-4 border-t border-gray-300">
+          <div className="p-4 border-t">
             <Button
               onClick={isRecording ? stopRecording : startRecording}
               className="w-full rounded-md"
@@ -150,7 +152,6 @@ export default function VoiceAssistant() {
             </Button>
             {audioUrl && (
               <div className="mt-4">
-                {/* <audio src={audioUrl} controls /> */}
               </div>
             )}
           </div>

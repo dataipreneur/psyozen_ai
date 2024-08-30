@@ -13,7 +13,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.2); 
+    
     /* semi-transparent white background */
     backdrop-filter: blur(40px); /* Apply the blur effect */
     z-index: 1; /* Ensure it's on top of the canvas */
@@ -36,5 +36,63 @@
     font-weight: bold; /* Font weight */
     /* text-shadow: 0 0 10px rgba(0, 0, 0, 0.5); Optional: add shadow for better visibility */
     z-index: 2; /* Ensure it's on top of the glass overlay */
+  }
+  
+  .centered-text {
+    
+    color: #5900ff; /* Default color */
+    transition: color 0.3s ease;
+  }
+  
+  .centered-text.playing {
+    color: #fff; /* White color when audio is playing */
+  }
+  
+
+  .box {
+    width: 60vmin;
+    height: 50vmin;
+    display: grid;
+    place-content: center;
+    color: white;
+    text-shadow: 0 1px 0 #000;
+    
+    --border-angle: 0turn; /* For animation. */
+    --main-bg: conic-gradient(
+        from var(--border-angle),
+        #213,
+        #112 5%,
+        #112 60%,
+        #213 95%
+      );
+    
+    border: solid 5px transparent;
+    border-radius: 2em;
+    --gradient-border: conic-gradient(from var(--border-angle), transparent 25%, #08f, #f03 99%, transparent);
+    
+    background:
+      var(--main-bg) padding-box,
+      var(--gradient-border) border-box,
+      var(--main-bg) border-box;
+    
+    background-position: center center;
+  
+    animation: bg-spin 3s linear infinite;
+  }
+  
+  @keyframes bg-spin {
+    to {
+      --border-angle: 1turn;
+    }
+  }
+  
+  .box:hover {
+    animation-play-state: paused;
+  }
+  
+  @property --border-angle {
+    syntax: "<angle>";
+    inherits: true;
+    initial-value: 0turn;
   }
   
